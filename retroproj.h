@@ -3,5 +3,6 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-void chargement(char * , char *);
-//void afficherMatice(float, int, int);
+float** chargement(char * , char *);
+void afficherMatice(float**, int, int);
+void liberationMem(float ** , int );
