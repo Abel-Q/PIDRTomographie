@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
 
-float** chargement(char * , char *);
-void afficherMatice(float**, int, int);
-void liberationMem(float ** , int );
+
+double** chargement(char * , char *);
+void afficherMatice(double**, int, int);
+void liberationMem(double ** , int );
+double** retroprojectionDiscrete(double** , char * );
+void ecritMatrice(double **,int, char * );

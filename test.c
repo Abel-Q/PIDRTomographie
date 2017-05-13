@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
 #include "retroproj.h"
+#include <math.h>
 
 
 int ** tableau_test(){
@@ -33,10 +32,16 @@ int main(int argc, char const *argv[]) {
   tab = tableau_test();
   tableau_test2(tab);*/
 
-  float** R;
+  double** R;
+  double** B;
   R = chargement("./Radon.txt","info.txt");
-  afficherMatice(R,256,180);
-  
+  //afficherMatice(R,256,180);
+
+  B = retroprojectionDiscrete(R,"info.txt");
+  //afficherMatice(B,256,256);
+  ecritMatrice(B,256,"./resultat.txt");
+
+
 
 
   return 0;
