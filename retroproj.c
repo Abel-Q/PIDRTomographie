@@ -163,14 +163,14 @@ double** retroprojectionDiscrete(double** proj, char * info){
 
 void ecritMatrice(double ** matrice,int Rx, char * file){
 
-  double m_min = 0;
-  double m_max =0;
+  double m_min = 300.00;
+  double m_max =0.00;
   double m;
   int i,j;
   for( i =0;i<Rx;i++){
     for (j =0; j<Rx;j++){
       m = matrice[i][j];
-      if (m_min>m && m>=0){
+      if (m_min>m && m>1){
         m_min = m;
       }
       if(m_max < m && m<=256){
@@ -178,6 +178,7 @@ void ecritMatrice(double ** matrice,int Rx, char * file){
       }
     }
   }
+  printf("m_min = %f, m_max = %f\n",m_min,m_max );
   for(i=0;i<Rx;i++){
     for(j=0;j<Rx;j++){
       matrice[i][j] = round((255/(m_max-m_min))*(matrice[i][j]-m_min));
