@@ -121,14 +121,13 @@ double** retroprojectionDiscrete(double** proj, char * info){
   double B[Rx][Rx];
   double rad;
 
-
   for(k=0;k<theta_max;k++){
     rad = (k*PI)/100;
     for(x=0;x<Rx;x++){
       for(y=0;y<Rx;y++){
         u=(x-Rx/2)*cos(rad)-(y-Rx/2)*sin(rad)+xp_offset;
-        u1 = ceil(u);
-        u2 = floor(u);
+        u1 = (int) ceil(u);
+        u2 = (int) floor(u);
         if(u1 > 255){
           u1=255;
         }
@@ -137,11 +136,11 @@ double** retroprojectionDiscrete(double** proj, char * info){
         }
 
         if(u1 == u2){
-          B[y][x] = B[y][x]+(proj[u1][k])*(PI/theta_max);
+          B[x][y] = B[x][y]+(proj[u1][k])*(PI/theta_max);
         }
         else{
           q = (proj[u2][k]+(u-u2)*((proj[u1][k]-proj[u2][k])/(u1-u2)))*(PI/theta_max);
-          B[y][x] = B[y][x] +q;
+          B[x][y] = B[x][y] +q;
         }
       }
     }
@@ -173,7 +172,7 @@ void ecritMatrice(double ** matrice,int Rx, char * file){
       if (m_min>m && m>1){
         m_min = m;
       }
-      if(m_max < m && m<=256){
+      if(m_max < m && m<255){
         m_max = m;
       }
     }
