@@ -1,57 +1,224 @@
 #include <stdio.h>
 #include <stdlib.h>
+//#include<complex.h>
 #include <math.h>
 #include <fftw3.h>
 
-int main(void)
+
+void transformer(double * in, int Rx, int Ry, double *res_re, double * res_im){
+  fftw_complex * spatial_repr;
+  fftw_complex * freq_repr;
+  fftw_plan plan;
+
+  /*double * res_re;
+  double * res_im;*/
+
+  int i,j,x,y;
+
+  spatial_repr = malloc(sizeof(fftw_complex)*Rx*Ry);
+  freq_repr = malloc(sizeof(fftw_complex)*Rx*Ry);
+  //printf("spatial_repr\n" );
+  for(i=0;i<Rx*Ry;i++){
+    spatial_repr[i][0] = in[i];
+    spatial_repr[i][1] = 0;
+    //printf("%f+i*(%f)\n",spatial_repr[i][0],spatial_repr[i][1] );
+  }
+
+  plan = fftw_plan_dft_2d(Rx,Ry,spatial_repr,freq_repr,FFTW_FORWARD,FFTW_ESTIMATE);
+  fftw_execute(plan);
+
+  /*res_re = malloc(sizeof(double)*Rx*Ry);
+  res_im = malloc(sizeof(double)*Rx*Ry);*/
+
+  //printf("freq_repr\n" );
+  for(i=0;i<Rx*Ry;i++){
+    res_re[i] = freq_repr[i][0];
+    res_im[i] = freq_repr[i][1];
+    //printf("%f+i*(%f)\n",freq_repr[i][0],freq_repr[i][1] );
+  }
+
+  for(j=0;j<Ry;j++){
+    for(i=0; i<Rx;i++){
+      x=i;
+      y=j;
+      if(i<Rx/2 && j<Ry/2){
+        x=i+Rx/2;
+        y=j+Ry/2;
+      }
+      if(i>=Rx/2 && j<Ry/2){
+        x=i-Rx/2;
+        y=j+Ry/2;
+      }
+      if(i<Rx/2 && j>=Ry/2){
+        x=i+Rx/2;
+        y=j-Ry/2;
+      }
+      if(i>=Rx/2 && j>=Ry/2){
+        x=i+Rx/2;
+        y=j+Ry/2;
+      }
+      res_re[y*Rx+x]=freq_repr[j*Rx+i][0];
+      res_im[y*Rx+x]=freq_repr[j*Rx+i][1];
+      //printf("%f+i*(%f)\n",res_re[i],res_im[i]);
+    }
+  }
+
+  fftw_destroy_plan(plan);
+  fftw_free(spatial_repr);
+  fftw_free(freq_repr);
+
+}
+
+double* inverse(double * reIn, double * imIn, int Rx, int Ry){
+  fftw_complex * spatial_repr;
+  fftw_complex * freq_repr;
+  fftw_plan plan;
+  double * out;
+
+  int i,j,x,y;
+
+  spatial_repr = malloc(sizeof(fftw_complex)*Rx*Ry);
+  freq_repr = malloc(sizeof(fftw_complex)*Rx*Ry);
+
+  for(j=0;j<Ry;j++){
+    for(i=0; i<Rx;i++){
+      x=i;
+      y=j;
+      if(i<Rx/2 && j<Ry/2){
+        x=i+Rx/2;
+        y=j+Ry/2;
+      }
+      if(i>=Rx/2 && j<Ry/2){
+        x=i-Rx/2;
+        y=j+Ry/2;
+      }
+      if(i<Rx/2 && j>=Ry/2){
+        x=i+Rx/2;
+        y=j-Ry/2;
+      }
+      if(i>=Rx/2 && j>=Ry/2){
+        x=i+Rx/2;
+        y=j+Ry/2;
+      }
+      freq_repr[j*Rx+i][0]=reIn[y*Rx+x];
+      freq_repr[j*Rx+i][1]=imIn[y*Rx+x];
+    }
+  }
+  plan = fftw_plan_dft_2d(Rx,Ry,freq_repr,spatial_repr,FFTW_BACKWARD,FFTW_ESTIMATE);
+  fftw_execute(plan);
+
+  out = malloc(sizeof(double)*Rx*Ry);
+  for(i=0;i<Rx*Ry;i++){
+    out[i]=spatial_repr[i][0]/(Rx*Ry);
+    //printf("%f\n",out[i] );
+  }
+  return out;
+  fftw_destroy_plan(plan);
+  fftw_free(spatial_repr);
+  fftw_free(freq_repr);
+}
+
+void filtre(double* reImg,double*imImg, double *reFiltre,double * imFiltre, int Rx, int Ry){
+  double a, b, c, d;
+  int i;
+
+  for(i=0; i<Rx*Ry;i++){
+    a = reImg[i];
+    b = imImg[i];
+    c = reFiltre[i];
+    d = imImg[i];
+
+    reImg[i] = a*c-b*d;
+    imImg[i] = b*c + a*d;
+  }
+}
+
+void fitreRamLak(double * reFiltre, double * imFiltre, int Rx, int Ry){
+  double * f;
+  int i;
+  f = malloc(sizeof(double)*Rx*Ry);
+  for (i=0;i<Rx*Ry;i++){
+    if(i<(Rx*Ry)/2){
+      f[i] = i;
+    }
+    else{
+      f[i] = (Rx*Ry)-i;
+    }
+    fftw_complex * filtre_av;
+    fftw_complex * filtre_ap;
+    fftw_plan plan;
+
+    filtre_av = fftw_malloc(sizeof(fftw_complex)*Rx*Ry);
+    filtre_ap = fftw_malloc(sizeof(fftw_complex)*Rx*Ry);
+
+    plan = fftw_plan_dft_1d(Rx*Ry,filtre_av,filtre_ap,FFTW_FORWARD,FFTW_ESTIMATE);
+    fftw_execute(plan);
+
+    for(i=0;i<Rx*Ry;i++){
+      reFiltre[i]=filtre_ap[i][0];
+      imFiltre[i]=filtre_ap[i][1];
+    }
+
+  }
+}
+
+double * miseForme(double ** matrice, int Rx, int Ry){
+  double * out;
+  int i,j;
+  out = malloc(sizeof(double)*Rx*Ry);
+  for(j=0;j<Ry;j++){
+    for(i=0;i<Rx;i++){
+      out[i+j*Rx]=matrice[i][j];
+    }
+  }
+  return out;
+}
+
+/*int main(void)
 {
-double array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-double array2[] = {20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
-double *out;
-double *err;
-int i,size = 10;
+ double * truc;//Rx=5 Ry =2
+  truc = malloc(sizeof(double)*10);
+  for(int i=0;i<10;i++){
+    truc[i]=i+1;
+  }
+  int Rx, Ry;
+  Rx = 5;
+  Ry = 2;
+  double * res_re;
+  double * res_im;
+  double * res;
+  res = malloc(sizeof(double)*Rx*Ry);
+  res_re = malloc(sizeof(double)*Rx*Ry);
+  res_im = malloc(sizeof(double)*Rx*Ry);
+  transformer(truc,Rx,Ry, res_re,res_im);
 
-fftw_complex *out_cpx, *in_cpx, *result_cpx, *out_cpx2;
+  double * reFiltre;
+  double * imFiltre;
+  reFiltre = malloc(sizeof(double)*Rx*Ry);
+  imFiltre = malloc(sizeof(double)*Rx*Ry);
 
-in_cpx = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*size);
-out_cpx = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*size);
-out_cpx2 = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*size);
-result_cpx = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*size);
-fftw_plan fft;
-fftw_plan ifft;
-
-out = (double *) malloc(size*sizeof(double));
-err = (double *) malloc(size*sizeof(double));
-
-for (i=0; i<size; i++){
-  in_cpx[i][0]=array[i];
-  in_cpx[i][1]=0;
-}
-
-fft = fftw_plan_dft_1d(size, in_cpx, out_cpx,FFTW_FORWARD, FFTW_ESTIMATE);  //Setup fftw plan for fft
-fftw_execute(fft);
-for(i=0;i<size; i++){
-  out_cpx[i][0]=out_cpx[i][0]*array2[i];
-}
-
-ifft = fftw_plan_dft_1d(size, out_cpx, result_cpx, FFTW_BACKWARD, FFTW_ESTIMATE);   //Setup fftw plan for ifft
-
-fftw_execute(ifft);
-
-//printf("Input:    \tOutput:    \tError:\n");
-printf("Input:    \tOutput:      \t Result :\n");
-for(i=0;i<size;i++)
-{
-printf("%f\t%f+i%f\t%f+i%f\n",(array[i]),out_cpx[i][0],out_cpx[i][1],result_cpx[i][0],result_cpx[i][1]);
-}
+  fitreRamLak(reFiltre,imFiltre,Rx,Ry);
+  filtre(res_re,res_im,reFiltre,imFiltre,Rx,Ry);
+  res = inverse(res_re,res_im,Rx,Ry);
 
 
-fftw_destroy_plan(fft);
-fftw_destroy_plan(ifft);
-fftw_free(out_cpx);
-fftw_free(in_cpx);
-fftw_free(result_cpx);
-free(err);
-free(out);
+  double ** matrice;
+  matrice = malloc(sizeof(double)*10);
+  int i;
+  for(i=0;i<10;i++){
+    matrice[i] = malloc(sizeof(double)*10);
+    for(int j=0;j<10;j++){
+      matrice[i][j] = i*j;
+    }
+  }
+
+  double * res;
+  res = malloc(sizeof(double)*10*10);
+  res = miseForme(matrice,10,10);
+
+  for(i =0;i<10*10;i++){
+    printf("%f\n",res[i]);
+  }
+
 return 0;
-}
+}*/
