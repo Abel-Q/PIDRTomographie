@@ -66,8 +66,12 @@ int main(int argc, char const *argv[]) {
   filtre(res_re,res_im,reFiltre,imFiltre,Rx,Ry);
   res = inverse(res_re,res_im,Rx,Ry);
 
+  double ** final;
 
-  B = retroprojectionDiscrete(R,"info.txt");
+  final = miseFormeInv(res,Rx,Ry);
+
+
+  B = retroprojectionDiscrete(final,"info.txt");
   //afficherMatice(B,256,256);
 
   ecritMatrice(B,256,"./resultat.txt");

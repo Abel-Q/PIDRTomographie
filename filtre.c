@@ -37,7 +37,7 @@ void transformer(double * in, int Rx, int Ry, double *res_re, double * res_im){
     //printf("%f+i*(%f)\n",freq_repr[i][0],freq_repr[i][1] );
   }
 
-  for(j=0;j<Ry;j++){
+  /*for(j=0;j<Ry;j++){
     for(i=0; i<Rx;i++){
       x=i;
       y=j;
@@ -57,11 +57,12 @@ void transformer(double * in, int Rx, int Ry, double *res_re, double * res_im){
         x=i+Rx/2;
         y=j+Ry/2;
       }
+      printf("y*Rx+x = %d, j*Rx+i = %d\n",y*Rx+x,j*Rx+i );
       res_re[y*Rx+x]=freq_repr[j*Rx+i][0];
       res_im[y*Rx+x]=freq_repr[j*Rx+i][1];
       //printf("%f+i*(%f)\n",res_re[i],res_im[i]);
     }
-  }
+  }*/
 
   fftw_destroy_plan(plan);
   fftw_free(spatial_repr);
@@ -169,6 +170,21 @@ double * miseForme(double ** matrice, int Rx, int Ry){
   for(j=0;j<Ry;j++){
     for(i=0;i<Rx;i++){
       out[i+j*Rx]=matrice[i][j];
+    }
+  }
+  return out;
+}
+
+double ** miseFormeInv(double * matrice, int Rx, int Ry){
+  double ** out;
+  int i,j;
+  out = malloc(sizeof(double)*Ry);
+
+  for(j=0;j<Ry;j++){
+    out[j]=malloc(sizeof(double)*Rx);
+    for(i=0;i<Rx;i++){
+      printf("(%d,%d)\n",j,i);
+      out[i][j]=matrice[i+j*Rx];
     }
   }
   return out;
