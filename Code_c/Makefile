@@ -6,8 +6,8 @@
 #	gcc -c retroproj.c -Wall `pkg-config opencv --cflags`
 
 
-test : test.c retroproj.o
-	gcc -Wall test.c retroproj.o  -o test -lm -lfftw3
+retroprojection : main.c retroproj.o
+	gcc -Wall main.c retroproj.o  -o retroprojection -lm
 
 retroproj.o : retroproj.c
 	gcc -c retroproj.c -Wall -lm

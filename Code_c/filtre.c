@@ -37,7 +37,7 @@ void transformer(double * in, int Rx, int Ry, double *res_re, double * res_im){
     //printf("%f+i*(%f)\n",freq_repr[i][0],freq_repr[i][1] );
   }
 
-  /*for(j=0;j<Ry;j++){
+  for(j=0;j<Ry;j++){
     for(i=0; i<Rx;i++){
       x=i;
       y=j;
@@ -62,7 +62,7 @@ void transformer(double * in, int Rx, int Ry, double *res_re, double * res_im){
       res_im[y*Rx+x]=freq_repr[j*Rx+i][1];
       //printf("%f+i*(%f)\n",res_re[i],res_im[i]);
     }
-  }*/
+  }
 
   fftw_destroy_plan(plan);
   fftw_free(spatial_repr);
@@ -189,52 +189,3 @@ double ** miseFormeInv(double * matrice, int Rx, int Ry){
   }
   return out;
 }
-
-/*int main(void)
-{
- double * truc;//Rx=5 Ry =2
-  truc = malloc(sizeof(double)*10);
-  for(int i=0;i<10;i++){
-    truc[i]=i+1;
-  }
-  int Rx, Ry;
-  Rx = 5;
-  Ry = 2;
-  double * res_re;
-  double * res_im;
-  double * res;
-  res = malloc(sizeof(double)*Rx*Ry);
-  res_re = malloc(sizeof(double)*Rx*Ry);
-  res_im = malloc(sizeof(double)*Rx*Ry);
-  transformer(truc,Rx,Ry, res_re,res_im);
-
-  double * reFiltre;
-  double * imFiltre;
-  reFiltre = malloc(sizeof(double)*Rx*Ry);
-  imFiltre = malloc(sizeof(double)*Rx*Ry);
-
-  fitreRamLak(reFiltre,imFiltre,Rx,Ry);
-  filtre(res_re,res_im,reFiltre,imFiltre,Rx,Ry);
-  res = inverse(res_re,res_im,Rx,Ry);
-
-
-  double ** matrice;
-  matrice = malloc(sizeof(double)*10);
-  int i;
-  for(i=0;i<10;i++){
-    matrice[i] = malloc(sizeof(double)*10);
-    for(int j=0;j<10;j++){
-      matrice[i][j] = i*j;
-    }
-  }
-
-  double * res;
-  res = malloc(sizeof(double)*10*10);
-  res = miseForme(matrice,10,10);
-
-  for(i =0;i<10*10;i++){
-    printf("%f\n",res[i]);
-  }
-
-return 0;
-}*/

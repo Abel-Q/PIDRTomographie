@@ -1,37 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <opencv/cv.h>
-//#include <opencv/highgui.h>
 #include "retroproj.h"
 #include <math.h>
 
-#define PI acos(-1.0)
-
-/*IplImage * chargement(char * src_path){
-  IplImage * img = NULL;
-
-  if (!(img = cvLoadImage(src_path, CV_LOAD_IMAGE_GRAYSCALE))){
-    printf("erreur d'ouverture de : %s\n",src_path );
-    return EXIT_FAILURE;
-  }
-  return img;
-}
-
-IplImage * retroproj(IplImage * sinuso){
-  int Rx = sinuso->width;
-  int Ry = sinuso->height;
-  printf("Rx = %d, Ry = %d\n",Rx,Ry );
-
-  return sinuso;
-}*/
-
-/*int main(int argc, char const *argv[]) {
-  IplImage * img =NULL;
-  img = chargement("./sinusogram.jpg");
-  retroproj(img);
-  return 0;
-}*/
-
+#define PI 3.14159265359
 
 void afficherMatice(double** matrice,int Rx, int theta_max){
   for(int i =0;i<Rx;i++){
@@ -60,10 +32,12 @@ double** chargement(char * radon, char * info){
 
   /* chargement de la matrice de la transformer de Radon dans un tableau local*/
 
+
   double R[Rx][theta_max];
   for(int i =0;i<Rx;i++){
     for (int j =0; j<theta_max;j++){
       fscanf(fichier_radon, "%lf\t",&R[i][j]);
+      //printf("%lf\n", R[i][j]);
     }
     fscanf(fichier_radon,"\n");
   }
@@ -115,7 +89,7 @@ double** retroprojectionDiscrete(double** proj, char * info){
   fscanf(fichier_info,"Rx = %d, theta_max = %d, xp_offset = %d\n",&Rx,&theta_max,&xp_offset);
   fclose(fichier_info);
 
-
+  Rx = 256;
   int k, x, y, u1, u2;
   double u, q;
   double B[Rx][Rx];
@@ -123,17 +97,11 @@ double** retroprojectionDiscrete(double** proj, char * info){
 
   for(k=1;k<theta_max+1;k++){
     rad = (k*PI)/100;
-    for(x=0;x<Rx;x++){
-      for(y=0;y<Rx;y++){
-        u=((x+1-(Rx+1)/2)*cos(rad)-((y+1)-(Rx+1)/2)*sin(rad)+xp_offset-1);
+    for(x=0;x<256;x++){
+      for(y=0;y<256;y++){
+        u=((x-Rx/2)*cos(rad)-(y-Rx/2)*sin(rad)+xp_offset);
         u1 = (int) ceil(u);
         u2 = (int) floor(u);
-        if(u1 > 255){
-          u1=255;
-        }
-        if(u2>255){
-          u2=255;
-        }
 
         if(u1 == u2){
           B[x][y] = B[x][y]+(proj[u1][k])*(PI/theta_max);

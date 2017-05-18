@@ -1,1 +1,1 @@
-Rx = 256, theta_max = 180, xp_offset = 184
+Rx = 367, theta_max = 180, xp_offset = 184

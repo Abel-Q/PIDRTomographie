@@ -3,7 +3,7 @@
 #include "retroproj.h"
 #include <math.h>
 //#include "filtre.h"
-
+#include<time.h>
 
 
 int main(int argc, char const *argv[]) {
