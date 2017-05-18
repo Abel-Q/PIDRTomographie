@@ -125,7 +125,7 @@ double** retroprojectionDiscrete(double** proj, char * info){
     rad = (k*PI)/100;
     for(x=0;x<Rx;x++){
       for(y=0;y<Rx;y++){
-        u=(x-Rx/2)*cos(rad)-(y-Rx/2)*sin(rad)+xp_offset;
+        u=((x+1-(Rx+1)/2)*cos(rad)-((y+1)-(Rx+1)/2)*sin(rad)+xp_offset-1);
         u1 = (int) ceil(u);
         u2 = (int) floor(u);
         if(u1 > 255){
