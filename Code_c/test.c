@@ -41,14 +41,14 @@ int main(int argc, char const *argv[]) {
   double** B;
 
 
-  t1 = clock();
-  for(int i =0;i<10;i++){
+
   R = chargement("./Radon.txt","info.txt");
   //afficherMatice(R,256,180);
 
 
 
-
+  //t1 = clock();
+  //for(int i =0;i<10;i++){
 
   int Rx, Ry;
   Rx = 256;
@@ -81,13 +81,13 @@ int main(int argc, char const *argv[]) {
 
   B = retroprojectionDiscrete(R,"info.txt");
   //afficherMatice(B,256,256);
-
+//}
+//  t2 = clock();
   ecritMatrice(B,256,"./resultat.txt");
-}
-  t2 = clock();
 
-  temps = (float)(t2-t1)/CLOCKS_PER_SEC;
-  printf("temps = %f\n",temps );
+
+  /*temps = (float)(t2-t1)/CLOCKS_PER_SEC;
+  printf("temps = %f\n",temps );*/
 
 
 

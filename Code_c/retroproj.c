@@ -121,7 +121,7 @@ double** retroprojectionDiscrete(double** proj, char * info){
   double B[Rx][Rx];
   double rad;
 
-  for(k=0;k<theta_max;k++){
+  for(k=1;k<theta_max+1;k++){
     rad = (k*PI)/100;
     for(x=0;x<Rx;x++){
       for(y=0;y<Rx;y++){
