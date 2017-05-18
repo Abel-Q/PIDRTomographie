@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "retroproj.h"
 #include <math.h>
-#include "filtre.h"
+//#include "filtre.h"
+#include<time.h>
 
 
 int ** tableau_test(){
@@ -33,8 +34,15 @@ int main(int argc, char const *argv[]) {
   tab = tableau_test();
   tableau_test2(tab);*/
 
+  float temps;
+  clock_t t1, t2;
+
   double** R;
   double** B;
+
+
+  t1 = clock();
+  for(int i =0;i<10;i++){
   R = chargement("./Radon.txt","info.txt");
   //afficherMatice(R,256,180);
 
@@ -46,9 +54,9 @@ int main(int argc, char const *argv[]) {
   Rx = 256;
   Ry = 256;
 
-  double * img;
-  img = malloc(sizeof(double)*Rx*Ry);
-  img = miseForme(R,Rx,Ry);
+  //double * img;
+  //img = malloc(sizeof(double)*Rx*Ry);
+  //img = miseForme(R,Rx,Ry);
 
   double * res_re;
   double * res_im;
@@ -56,27 +64,30 @@ int main(int argc, char const *argv[]) {
   res = malloc(sizeof(double)*Rx*Ry);
   res_re = malloc(sizeof(double)*Rx*Ry);
   res_im = malloc(sizeof(double)*Rx*Ry);
-  transformer(img,Rx,Ry, res_re,res_im);
-  double * reFiltre;
+  //transformer(R,Rx,Ry, res_re,res_im);
+  /*double * reFiltre;
   double * imFiltre;
   reFiltre = malloc(sizeof(double)*Rx*Ry);
   imFiltre = malloc(sizeof(double)*Rx*Ry);
 
   fitreRamLak(reFiltre,imFiltre,Rx,Ry);
-  filtre(res_re,res_im,reFiltre,imFiltre,Rx,Ry);
-  res = inverse(res_re,res_im,Rx,Ry);
+  filtre(res_re,res_im,reFiltre,imFiltre,Rx,Ry);*/
+  //res = inverse(res_re,res_im,Rx,Ry);
 
-  double ** final;
+  /*double ** final;
 
-  final = miseFormeInv(res,Rx,Ry);
+  final = miseFormeInv(res,Rx,Ry);*/
 
 
-  B = retroprojectionDiscrete(final,"info.txt");
+  B = retroprojectionDiscrete(R,"info.txt");
   //afficherMatice(B,256,256);
 
   ecritMatrice(B,256,"./resultat.txt");
+}
+  t2 = clock();
 
-
+  temps = (float)(t2-t1)/CLOCKS_PER_SEC;
+  printf("temps = %f\n",temps );
 
 
 
